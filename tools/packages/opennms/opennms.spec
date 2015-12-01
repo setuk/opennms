@@ -63,6 +63,8 @@ Requires(pre):		%{name}-webui       = %{version}-%{release}
 Requires:		%{name}-webui       = %{version}-%{release}
 Requires(pre):		%{name}-core        = %{version}-%{release}
 Requires:		%{name}-core        = %{version}-%{release}
+Requires(pre):		%{name}-source      = %{version}-%{release}
+Requires:		%{name}-source      = %{version}-%{release}
 Requires(pre):		postgresql-server  >= 9.1
 Requires:		postgresql-server  >= 9.1
 
@@ -114,6 +116,17 @@ If you wish to install them to an alternate location, use the --relocate rpm
 option, like so:
 
   rpm -i --relocate %{logdir}=/mnt/netapp/%{name}-logs %{name}-core.rpm
+
+%{extrainfo}
+%{extrainfo2}
+
+
+%package source
+Summary:	Source for the %{_descr} network management platform
+Group:		Applications/System
+
+%description source
+This package contains the source tarball for %{_descr}, for AGPL compliance.
 
 %{extrainfo}
 %{extrainfo2}
@@ -695,6 +708,7 @@ find $RPM_BUILD_ROOT%{instprefix}/etc $RPM_BUILD_ROOT%{instprefix}/lib $RPM_BUIL
 # jetty
 find $RPM_BUILD_ROOT%{jettydir} ! -type d | \
 	sed -e "s,^$RPM_BUILD_ROOT,," | \
+	grep -v '/opennms/source/' | \
 	grep -v '/WEB-INF/[^/]*\.xml$' | \
 	grep -v '/WEB-INF/[^/]*\.properties$' | \
 	grep -v '/WEB-INF/jsp/alarm/ncs' | \
@@ -755,6 +769,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{sharedir}/etc-pristine/drools-engine.d/ncs
 %{sharedir}/etc-pristine/drools-engine.d/ncs/*
 %{sharedir}/etc-pristine/ncs-northbounder-configuration.xml
+
+%files source
+%defattr(644 root root 755)
+%{jettydir}/opennms/source/*
 
 %files webapp-jetty -f %{_tmppath}/files.jetty
 %defattr(644 root root 755)
