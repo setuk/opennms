@@ -28,6 +28,11 @@
 
 package org.opennms.features.topology.plugins.topo.atlas;
 
+import java.net.MalformedURLException;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
 import org.opennms.features.topology.api.support.VertexHopGraphProvider;
@@ -41,10 +46,6 @@ import org.opennms.features.topology.plugins.topo.atlas.vertices.ParentAtlasVert
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBException;
-import java.net.MalformedURLException;
-import java.util.List;
-
 public class AtlasTopologyProvider extends AbstractTopologyProvider implements GraphProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AtlasTopologyProvider.class);
 
@@ -57,7 +58,7 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
     }
 
     private void loadRoot() {
-        final Vertex vxParent = new ParentAtlasVertex("parent", "Regions", "regions");
+        final Vertex vxParent = new ParentAtlasVertex("parent", "Regions", null);
 
         final Vertex vxNorth = new DefaultAtlasVertex("north", "North", "north");
         final Vertex vxWest = new DefaultAtlasVertex("west", "West", "west");

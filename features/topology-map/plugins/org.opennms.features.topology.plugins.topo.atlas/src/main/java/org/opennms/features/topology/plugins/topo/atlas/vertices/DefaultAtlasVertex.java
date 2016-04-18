@@ -9,6 +9,6 @@ public class DefaultAtlasVertex extends AbstractAtlasVertex {
 
     @Override
     public int getLevel() {
-        return 100;
+        return 1;
     }
 }

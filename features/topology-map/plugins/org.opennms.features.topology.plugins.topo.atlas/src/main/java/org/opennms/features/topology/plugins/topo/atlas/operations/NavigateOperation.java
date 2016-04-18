@@ -26,15 +26,18 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.topology.plugins.topo.atlas;
+package org.opennms.features.topology.plugins.topo.atlas.operations;
 
-import com.vaadin.ui.UI;
+import java.util.List;
+
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
 import org.opennms.features.topology.api.topo.VertexRef;
+import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
 import org.opennms.features.topology.plugins.topo.atlas.vertices.AbstractAtlasVertex;
 
-import java.util.List;
+import com.google.common.base.Strings;
+import com.vaadin.ui.UI;
 
 public class NavigateOperation implements Operation {
 
@@ -50,8 +53,12 @@ public class NavigateOperation implements Operation {
     }
 
     @Override
-    public boolean enabled(List<VertexRef> targets,OperationContext operationContext) {
-    	return targets.size() == 1;
+    public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
+    	if (targets.size() == 1) {
+            return !Strings.isNullOrEmpty(((AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0))).getGlue());
+        }
+
+        return false;
     }
 
     @Override
@@ -66,6 +73,9 @@ public class NavigateOperation implements Operation {
         }
 
         final AbstractAtlasVertex vertex = (AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0));
+
+        if (Strings.isNullOrEmpty(vertex.getGlue()))
+            return;
 
         topologyProvider.setSubgraph(vertex.getGlue());
 

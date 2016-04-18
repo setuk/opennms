@@ -36,7 +36,7 @@ http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.
 		</service-properties>
 	</service>
 
-	<bean id="navigateOperation" scope="singleton" class="org.opennms.features.topology.plugins.topo.atlas.NavigateOperation">
+	<bean id="navigateOperation" scope="singleton" class="org.opennms.features.topology.plugins.topo.atlas.operations.NavigateOperation">
 		<argument ref="atlasTopologyProvider" />
 	</bean>
 
@@ -44,7 +44,7 @@ http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.
 		<service-properties>
 			<entry key="operation.menuLocation" value="Device"/>
 			<entry key="operation.contextMenuLocation" value=""/>
-			<entry key="operation.label" value="Navigate to ..."/>
+			<entry key="operation.label" value="Navigate to"/>
 		</service-properties>
 	</service>
 </blueprint>
