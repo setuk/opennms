@@ -1,0 +1,50 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+xsi:schemaLocation="
+http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
+">
+
+	<bean id="atlasMetaInfo" class="org.opennms.features.topology.api.topo.DefaultMetaInfo">
+		<property name="name" value="Atlas Topology Provider"/>
+		<property name="description" value="This Topology Provider visualizes a predefined graph."/>
+	</bean>
+
+	<bean id="atlasTopologyProvider" scope="singleton" class="org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider">
+		<property name="metaInfo" ref="atlasMetaInfo"/>
+	</bean>
+
+	<bean id="atlasTopologyHopProvider" class="org.opennms.features.topology.api.support.VertexHopGraphProvider">
+		<argument ref="atlasTopologyProvider" />
+	</bean>
+
+	<service interface="org.opennms.features.topology.api.topo.VertexProvider" ref="atlasTopologyHopProvider">
+		<service-properties>
+			<entry key="label" value="Atlas Topology" />
+		</service-properties>
+	</service>
+	<service interface="org.opennms.features.topology.api.topo.EdgeProvider" ref="atlasTopologyHopProvider">
+		<service-properties>
+			<entry key="label" value="Atlas Topology" />
+		</service-properties>
+	</service>
+	<service interface="org.opennms.features.topology.api.topo.GraphProvider" ref="atlasTopologyHopProvider">
+		<service-properties>
+			<entry key="label" value="Atlas Topology" />
+			<entry key="preferredLayout" value="Hierarchy Layout" />
+		</service-properties>
+	</service>
+
+	<bean id="navigateOperation" scope="singleton" class="org.opennms.features.topology.plugins.topo.atlas.NavigateOperation">
+		<argument ref="atlasTopologyProvider" />
+	</bean>
+
+	<service interface="org.opennms.features.topology.api.Operation" ref="navigateOperation">
+		<service-properties>
+			<entry key="operation.menuLocation" value="Device"/>
+			<entry key="operation.contextMenuLocation" value=""/>
+			<entry key="operation.label" value="Navigate to ..."/>
+		</service-properties>
+	</service>
+</blueprint>
