@@ -26,60 +26,62 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.topology.plugins.topo.atlas.operations;
+package org.opennms.features.topology.plugins.topo.atlas.criteria;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.opennms.features.topology.api.Operation;
-import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.support.VertexHopGraphProvider;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
-import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
 import org.opennms.features.topology.plugins.topo.atlas.vertices.AbstractAtlasVertex;
 
-import com.google.common.base.Strings;
-
-public class NavigateOperation implements Operation {
-
+public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCriteria {
     private final AtlasTopologyProvider topologyProvider;
+    private final String subGraphId;
 
-    public NavigateOperation(final AtlasTopologyProvider topologyProvider) {
+    public AtlasSubGraphCriteria(final AtlasTopologyProvider topologyProvider, final String subGraphId) {
+        super("Sub-graph " + subGraphId);
         this.topologyProvider = topologyProvider;
+        this.subGraphId = subGraphId;
     }
-    
-    @Override
-    public boolean display(List<VertexRef> targets, OperationContext operationContext) {
-        return true;
+
+    public AtlasTopologyProvider getTopologyProvider() {
+        return topologyProvider;
+    }
+
+    public String getSubGraphId() {
+        return subGraphId;
     }
 
     @Override
-    public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
-    	if (targets.size() == 1) {
-            return !Strings.isNullOrEmpty(((AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0))).getGlue());
+    public Set<VertexRef> getVertices() {
+        return topologyProvider.getVertices().stream().filter(vx -> subGraphId.equals(((AbstractAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
+    }
+
+    @Override
+    public String getNamespace() {
+        return topologyProvider.getVertexNamespace();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subGraphId, topologyProvider);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
-
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof AtlasSubGraphCriteria) {
+            return Objects.equals(topologyProvider, ((AtlasSubGraphCriteria) obj).getTopologyProvider()) &&
+                    Objects.equals(subGraphId, ((AtlasSubGraphCriteria) obj).getSubGraphId());
+        }
         return false;
-    }
-
-    @Override
-    public String getId() {
-        return "Navigate";
-    }
-
-    @Override
-    public void execute(List<VertexRef> targets, OperationContext operationContext) {
-        if (targets.isEmpty()) {
-            return;
-        }
-
-        final AbstractAtlasVertex vertex = (AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0));
-
-        if (Strings.isNullOrEmpty(vertex.getGlue()))
-            return;
-
-        operationContext.getGraphContainer().clearCriteria();
-        operationContext.getGraphContainer().addCriteria(new AtlasSubGraphCriteria(topologyProvider, vertex.getGlue()));
-
-        operationContext.getGraphContainer().redoLayout();
     }
 }
