@@ -57,7 +57,7 @@ public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCrite
 
     @Override
     public Set<VertexRef> getVertices() {
-        return topologyProvider.getVertices().stream().filter(vx -> subGraphId.equals(((AbstractAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
+        return topologyProvider.getVertices().stream().filter(vx -> ((AbstractAtlasVertex) vx).getLevel() == 0 && subGraphId.equals(((AbstractAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
     }
 
     @Override
