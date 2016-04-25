@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2012-2014 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
+ * Copyright (C) 2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,31 +26,42 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.topology.plugins.topo.atlas.vertices;
+package org.opennms.features.topology.graphml;
 
-import org.opennms.features.topology.api.topo.LevelAware;
-import org.opennms.features.topology.api.topo.SimpleLeafVertex;
-import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class AbstractAtlasVertex extends SimpleLeafVertex implements LevelAware {
-    private final String glue;
-    private final String subGraphId;
+public class GraphMLGraph extends GraphMLElement {
 
-    public AbstractAtlasVertex(final String id,
-                               final String label,
-                               final String subGraphId,
-                               final String glue) {
-        super(AtlasTopologyProvider.TOPOLOGY_NAMESPACE, id, null, null);
-        this.setLabel(label);
-        this.subGraphId = subGraphId;
-        this.glue = glue;
+    private List<GraphMLEdge> edges = new ArrayList<>();
+
+    private List<GraphMLNode> nodes = new ArrayList<>();
+
+    public GraphMLGraph() {
     }
 
-    public String getGlue() {
-        return this.glue;
+    public void addEdge(GraphMLEdge edge) {
+        edges.add(edge);
     }
 
-    public String getSubGraphId() {
-        return this.subGraphId;
+    public void addNode(GraphMLNode node) {
+        nodes.add(node);
+    }
+
+    public List<GraphMLEdge> getEdges() {
+        return edges;
+    }
+
+    public List<GraphMLNode> getNodes() {
+        return nodes;
+    }
+
+    public GraphMLNode getNodeById(String id) {
+        return getNodes().stream().filter(node -> node.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public <T> T accept(GraphMLElementVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

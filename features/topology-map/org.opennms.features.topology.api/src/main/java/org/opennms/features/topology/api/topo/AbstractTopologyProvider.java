@@ -52,7 +52,7 @@ public abstract class AbstractTopologyProvider extends DelegatingVertexEdgeProvi
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractTopologyProvider.class);
 
-	/**
+    /**
 	 * This class generates an unique id. 
 	 * The generated id has the format '<prefix><counter>' (e.g. v100). 
 	 * So the generator must be initialized with a prefix and the initial counter.

@@ -28,16 +28,45 @@
 
 package org.opennms.features.topology.plugins.topo.atlas.vertices;
 
-public class DefaultAtlasVertex extends AbstractAtlasVertex {
-    public DefaultAtlasVertex(final String id,
+import java.util.HashMap;
+
+import org.opennms.features.topology.api.topo.LevelAware;
+import org.opennms.features.topology.api.topo.SimpleLeafVertex;
+
+public class DefaultAtlasVertex extends SimpleLeafVertex implements LevelAware {
+    private String glue;
+    private final String subGraphId;
+    private HashMap<String, Object> properties = new HashMap<>();
+
+    public DefaultAtlasVertex(final String namespace,
+                              final String id,
                               final String label,
                               final String subGraphId,
                               final String glue) {
-        super(id, label, subGraphId, glue);
+        super(namespace, id, null, null);
+        this.setLabel(label);
+        this.subGraphId = subGraphId;
+        this.glue = glue;
+    }
+
+    public String getGlue() {
+        return this.glue;
+    }
+
+    public String getSubGraphId() {
+        return this.subGraphId;
     }
 
     @Override
     public int getLevel() {
-        return 1;
+        return glue != null ? 1 : 0;
+    }
+
+    public void setProperties(HashMap<String, Object> properties) {
+        this.properties = properties;
+    }
+
+    public void setGlue(String subGraphId) {
+        this.glue = subGraphId;
     }
 }

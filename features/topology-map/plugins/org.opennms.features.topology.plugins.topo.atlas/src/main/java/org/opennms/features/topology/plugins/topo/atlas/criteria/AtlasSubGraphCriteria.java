@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import org.opennms.features.topology.api.support.VertexHopGraphProvider;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
-import org.opennms.features.topology.plugins.topo.atlas.vertices.AbstractAtlasVertex;
+import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
 
 public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCriteria {
     private final AtlasTopologyProvider topologyProvider;
@@ -57,7 +57,7 @@ public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCrite
 
     @Override
     public Set<VertexRef> getVertices() {
-        return topologyProvider.getVertices().stream().filter(vx -> ((AbstractAtlasVertex) vx).getLevel() == 0 && subGraphId.equals(((AbstractAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
+        return topologyProvider.getVertices().stream().filter(vx -> subGraphId.equals(((DefaultAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
     }
 
     @Override

@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd">
+    <key id="graphLink" for="node" attr.name="graphLink" attr.type="string"></key>
+    <key id="iconKey" for="node" attr.name="iconKey" attr.type="string"></key>
+    <key id="ipAddr" for="node" attr.name="ipAddr" attr.type="string"></key>
+    <key id="label" for="node" attr.name="label" attr.type="string"></key>
+    <key id="locked" for="node" attr.name="locked" attr.type="boolean"></key>
+    <key id="namespace" for="node" attr.name="namespace" attr.type="string"></key>
+    <key id="selected" for="node" attr.name="selected" attr.type="boolean"></key>
+    <key id="x" for="node" attr.name="x" attr.type="int"></key>
+    <key id="namespace-edge" for="all" attr.name="namespace" attr.type="string">
+        <default>atlas</default>
+    </key>
+    <graph id="regions">
+        <node id="regions.root">
+            <data key="label">Regions</data>
+        </node>
+        <node id="regions.north">
+            <data key="label">North</data>
+            <data key="graphLink">regions.north</data>
+        </node>
+        <node id="regions.west">
+            <data key="label">West</data>
+            <data key="graphLink">regions.west</data>
+        </node>
+        <node id="regions.south">
+            <data key="label">South</data>
+            <data key="graphLink">regions.south</data>
+        </node>
+        <node id="regions.east">
+            <data key="label">East</data>
+            <data key="graphLink">regions.east</data>
+        </node>
+        <edge id="root.e1" source="regions.root" target="regions.north"/>
+        <edge id="root.e2" source="regions.root" target="regions.east"/>
+        <edge id="root.e3" source="regions.root" target="regions.west"/>
+        <edge id="root.e4" source="regions.root" target="regions.south"/>
+    </graph>
+    <graph id="regions.north">
+        <node id="regions.north.root">
+            <data key="label">North</data>
+            <data key="graphLink">regions</data>
+        </node>
+        <node id="regions.north.1">
+            <data key="label">North 1</data>
+        </node>
+        <node id="regions.north.2">
+            <data key="label">North 2</data>
+        </node>
+        <node id="regions.north.3">
+            <data key="label">North 3</data>
+        </node>
+        <node id="regions.north.4">
+            <data key="label">North 4</data>
+        </node>
+        <edge id="regions.north.root.e1" source="regions.north.root" target="regions.north.1"/>
+        <edge id="regions.north.root.e2" source="regions.north.root" target="regions.north.2"/>
+        <edge id="regions.north.root.e3" source="regions.north.root" target="regions.north.3"/>
+        <edge id="regions.north.root.e4" source="regions.north.root" target="regions.north.4"/>
+    </graph>
+    <graph id="regions.west">
+        <node id="regions.west.root">
+            <data key="label">West</data>
+            <data key="graphLink">regions</data>
+        </node>
+        <node id="regions.west.1">
+            <data key="label">West 1</data>
+        </node>
+        <node id="regions.west.2">
+            <data key="label">West 2</data>
+        </node>
+        <node id="regions.west.3">
+            <data key="label">West 3</data>
+        </node>
+        <node id="regions.west.4">
+            <data key="label">West 4</data>
+        </node>
+        <edge id="regions.west.root.e1" source="regions.west.root" target="regions.west.1"/>
+        <edge id="regions.west.root.e2" source="regions.west.root" target="regions.west.2"/>
+        <edge id="regions.west.root.e3" source="regions.west.root" target="regions.west.3"/>
+        <edge id="regions.west.root.e4" source="regions.west.root" target="regions.west.4"/>
+    </graph>
+    <graph id="regions.south">
+        <node id="regions.south.root">
+            <data key="label">South</data>
+            <data key="graphLink">regions</data>
+        </node>
+        <node id="regions.south.1">
+            <data key="label">South 1</data>
+        </node>
+        <node id="regions.south.2">
+            <data key="label">South 2</data>
+        </node>
+        <node id="regions.south.3">
+            <data key="label">South 3</data>
+        </node>
+        <node id="regions.south.4">
+            <data key="label">South 4</data>
+        </node>
+        <edge id="regions.south.root.e1" source="regions.south.root" target="regions.south.1"/>
+        <edge id="regions.south.root.e2" source="regions.south.root" target="regions.south.2"/>
+        <edge id="regions.south.root.e3" source="regions.south.root" target="regions.south.3"/>
+        <edge id="regions.south.root.e4" source="regions.south.root" target="regions.south.4"/>
+    </graph>
+    <graph id="regions.east">
+        <node id="regions.east.root">
+            <data key="label">East</data>
+            <data key="graphLink">regions</data>
+        </node>
+        <node id="regions.east.1">
+            <data key="label">East 1</data>
+        </node>
+        <node id="regions.east.2">
+            <data key="label">East 2</data>
+        </node>
+        <node id="regions.east.3">
+            <data key="label">East 3</data>
+        </node>
+        <node id="regions.east.4">
+            <data key="label">East 4</data>
+        </node>
+        <edge id="regions.east.root.e1" source="regions.east.root" target="regions.east.1"/>
+        <edge id="regions.east.root.e2" source="regions.east.root" target="regions.east.2"/>
+        <edge id="regions.east.root.e3" source="regions.east.root" target="regions.east.3"/>
+        <edge id="regions.east.root.e4" source="regions.east.root" target="regions.east.4"/>
+    </graph>
+</graphml>

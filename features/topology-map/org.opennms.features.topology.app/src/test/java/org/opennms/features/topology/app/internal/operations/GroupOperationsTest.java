@@ -35,7 +35,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,7 +127,7 @@ public class GroupOperationsTest {
 	private SimpleGraphProvider m_topologyProvider;
 
 	@Before
-	public void setUp() throws MalformedURLException, JAXBException {
+	public void setUp() throws IOException, JAXBException {
 		if(m_topologyProvider == null) {
 			m_topologyProvider = new SimpleGraphProvider();
 			m_topologyProvider.setTopologyLocation(new File("target/test-classes/graph.xml").toURI());

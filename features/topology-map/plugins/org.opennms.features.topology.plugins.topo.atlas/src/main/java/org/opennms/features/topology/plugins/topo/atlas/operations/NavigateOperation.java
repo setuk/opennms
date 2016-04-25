@@ -35,7 +35,7 @@ import org.opennms.features.topology.api.OperationContext;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
 import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
-import org.opennms.features.topology.plugins.topo.atlas.vertices.AbstractAtlasVertex;
+import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
 
 import com.google.common.base.Strings;
 
@@ -55,7 +55,7 @@ public class NavigateOperation implements Operation {
     @Override
     public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
     	if (targets.size() == 1) {
-            return !Strings.isNullOrEmpty(((AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0))).getGlue());
+            return !Strings.isNullOrEmpty(((DefaultAtlasVertex) topologyProvider.getVertex(targets.get(0))).getGlue());
         }
 
         return false;
@@ -68,18 +68,11 @@ public class NavigateOperation implements Operation {
 
     @Override
     public void execute(List<VertexRef> targets, OperationContext operationContext) {
-        if (targets.isEmpty()) {
-            return;
+        final DefaultAtlasVertex vertex = (DefaultAtlasVertex) topologyProvider.getVertex(targets.get(0));
+        if (!Strings.isNullOrEmpty(vertex.getGlue())) {
+            operationContext.getGraphContainer().clearCriteria();
+            operationContext.getGraphContainer().addCriteria(new AtlasSubGraphCriteria(topologyProvider, vertex.getGlue()));
+            operationContext.getGraphContainer().redoLayout();
         }
-
-        final AbstractAtlasVertex vertex = (AbstractAtlasVertex) topologyProvider.getVertex(targets.get(0));
-
-        if (Strings.isNullOrEmpty(vertex.getGlue()))
-            return;
-
-        operationContext.getGraphContainer().clearCriteria();
-        operationContext.getGraphContainer().addCriteria(new AtlasSubGraphCriteria(topologyProvider, vertex.getGlue()));
-
-        operationContext.getGraphContainer().redoLayout();
     }
 }

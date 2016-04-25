@@ -28,6 +28,9 @@
 
 package org.opennms.features.topology.plugins.topo.atlas;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -35,14 +38,22 @@ import javax.xml.bind.JAXBException;
 
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
+import org.opennms.features.topology.api.topo.AbstractEdge;
 import org.opennms.features.topology.api.topo.AbstractTopologyProvider;
 import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.GraphProvider;
-import org.opennms.features.topology.api.topo.Vertex;
+import org.opennms.features.topology.api.topo.SimpleEdgeProvider;
+import org.opennms.features.topology.api.topo.SimpleVertexProvider;
 import org.opennms.features.topology.api.topo.VertexRef;
+import org.opennms.features.topology.graphml.GraphML;
+import org.opennms.features.topology.graphml.GraphMLEdge;
+import org.opennms.features.topology.graphml.GraphMLGraph;
+import org.opennms.features.topology.graphml.GraphMLNode;
+import org.opennms.features.topology.graphml.GraphMLProperties;
+import org.opennms.features.topology.graphml.GraphMLReader;
+import org.opennms.features.topology.graphml.InvalidGraphException;
 import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
 import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
-import org.opennms.features.topology.plugins.topo.atlas.vertices.ParentAtlasVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,59 +62,86 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
 
     public static final String TOPOLOGY_NAMESPACE = "atlas";
 
+    private String defaultSubGraphId;
+
+
+//    private String filename;
+
+    // TODO MVR the namespace should be defined by the input file ...
     public AtlasTopologyProvider() {
         super(TOPOLOGY_NAMESPACE);
     }
 
-    private void loadRoot() {
-        final Vertex vxParent = new ParentAtlasVertex("regions", "Regions", "regions-subgraph", null);
-
-        final Vertex vxNorth = new DefaultAtlasVertex("north", "North", "regions-subgraph", "north-subgraph");
-        final Vertex vxWest = new DefaultAtlasVertex("west", "West", "regions-subgraph", "west-subgraph");
-        final Vertex vxSouth = new DefaultAtlasVertex("south", "South", "regions-subgraph", "south-subgraph");
-        final Vertex vxEast = new DefaultAtlasVertex("east", "East", "regions-subgraph", "east-subgraph");
-
-        addVertices(vxParent, vxNorth, vxSouth, vxWest, vxEast);
-
-        connectVertices(vxParent, vxNorth);
-        connectVertices(vxParent, vxWest);
-        connectVertices(vxParent, vxSouth);
-        connectVertices(vxParent, vxEast);
-
-        loadSite("North", "north-subgraph", "regions-subgraph");
-        loadSite("South", "south-subgraph", "regions-subgraph");
-        loadSite("East", "east-subgraph", "regions-subgraph");
-        loadSite("West", "west-subgraph", "regions-subgraph");
-    }
-
-    private void loadSite(final String site, final String subGraphId, final String glue) {
-
-        final Vertex vxParent = new ParentAtlasVertex(subGraphId, site, subGraphId, glue);
-
-        final Vertex vxSite1 = new DefaultAtlasVertex(site.toLowerCase() + "1", site + "1", null, null);
-        final Vertex vxSite2 = new DefaultAtlasVertex(site.toLowerCase() + "2", site + "2", null, null);
-        final Vertex vxSite3 = new DefaultAtlasVertex(site.toLowerCase() + "3", site + "3", null, null);
-
-        addVertices(vxParent, vxSite1, vxSite2, vxSite3);
-
-        connectVertices(vxParent, vxSite1);
-        connectVertices(vxParent, vxSite2);
-        connectVertices(vxParent, vxSite3);
-    }
-
-    private void load() {
-        resetContainer();
-        loadRoot();
+    @Override
+    public void refresh() {
+        try {
+            this.load(null);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
     @Override
-    public void refresh() {
-        this.load();
+    public void resetContainer() {
+        super.resetContainer();
+        defaultSubGraphId = null;
     }
 
     @Override
     public void load(final String filename) throws MalformedURLException, JAXBException {
-        this.load();
+        resetContainer();
+        try (InputStream input = new FileInputStream("/Users/mvrueden/Desktop/test.graphml")) {
+            GraphML graphML = GraphMLReader.read(input);
+            defaultSubGraphId = graphML.getProperty("defaultSubGraph");
+            final String namespace = graphML.getNamespace();
+            if (!getVertexNamespace().equals(namespace)) {
+                LoggerFactory.getLogger(this.getClass()).info("Creating new vertex provider with namespace {}", namespace);
+                m_vertexProvider = new SimpleVertexProvider(namespace);
+            }
+            if (!getEdgeNamespace().equals(namespace)) {
+                LoggerFactory.getLogger(this.getClass()).info("Creating new edge provider with namespace {}", namespace);
+                m_edgeProvider = new SimpleEdgeProvider(namespace);
+            }
+
+            // Add all Nodes to container
+            for (GraphMLGraph eachGraph : graphML.getGraphs()) {
+                for (GraphMLNode vertex : eachGraph.getNodes()) {
+                    DefaultAtlasVertex newVertex = new DefaultAtlasVertex(
+                            vertex.getNamespace(),
+                            vertex.getId(),
+                            vertex.getLabel(),
+                            eachGraph.getId(),
+                            vertex.getProperty(GraphMLProperties.GRAPH_LINK));
+                    newVertex.setIconKey(vertex.getIconKey());
+                    newVertex.setIpAddress(vertex.getIpAddr());
+                    newVertex.setLabel(vertex.getLabel());
+                    newVertex.setLocked(vertex.isLocked());
+                    if (vertex.getNodeID() != null) newVertex.setNodeID(vertex.getNodeID());
+                    newVertex.setSelected(vertex.isSelected());
+                    newVertex.setStyleName(vertex.getStyleName());
+                    newVertex.setTooltipText(vertex.getTooltipText());
+                    newVertex.setProperties(vertex.getProperties());
+                    addVertices(newVertex);
+                }
+            }
+
+            // Add all Edges to container
+            for (GraphMLGraph eachGraph : graphML.getGraphs()) {
+                for (GraphMLEdge edge : eachGraph.getEdges()) {
+                    AbstractEdge newEdge = connectVertices(edge.getId(), edge.getSource(), edge.getTarget(), edge.getNamespace());
+                    newEdge.setLabel(edge.getLabel());
+                    newEdge.setTooltipText(edge.getTooltipText());
+                }
+            }
+        } catch (InvalidGraphException | IOException e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
+
+    private AbstractEdge connectVertices(String id, GraphMLNode source, GraphMLNode target, String namespace) {
+        DefaultAtlasVertex sourceVertex = (DefaultAtlasVertex) getVertex(source.getNamespace(), source.getId());
+        DefaultAtlasVertex targetVertex = (DefaultAtlasVertex) getVertex(target.getNamespace(), target.getId());
+        return connectVertices(id, sourceVertex, targetVertex, namespace);
     }
 
     @Override
@@ -113,7 +151,17 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
 
     @Override
     public Criteria getDefaultCriteria() {
-        return new AtlasSubGraphCriteria(this, "regions-subgraph");
+        if (defaultSubGraphId != null) {
+            return new AtlasSubGraphCriteria(this, defaultSubGraphId);
+        }
+        DefaultAtlasVertex defaultVertex = getVertices().stream()
+                .map(v -> (DefaultAtlasVertex) v)
+                .filter(v -> v.getGlue() == null)
+                .findFirst().orElse(null);
+        if (defaultVertex != null) {
+            return new AtlasSubGraphCriteria(this, defaultVertex.getSubGraphId());
+        }
+        return null;
     }
 
     @Override

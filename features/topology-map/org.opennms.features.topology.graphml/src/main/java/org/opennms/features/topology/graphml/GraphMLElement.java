@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2012-2014 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
+ * Copyright (C) 2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,19 +26,46 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.topology.plugins.topo.atlas.vertices;
+package org.opennms.features.topology.graphml;
 
-public class ParentAtlasVertex extends AbstractAtlasVertex {
 
-    public ParentAtlasVertex(final String id,
-                             final String label,
-                             final String subGraphId,
-                             final String glue) {
-        super(id, label, subGraphId, glue);
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class GraphMLElement {
+
+    public interface GraphMLElementVisitor<T> {
+        T visit(GraphMLGraph graph);
+        T visit(GraphMLNode node);
+        T visit(GraphMLEdge edge);
+        T visit(GraphML graphML);
     }
 
-    @Override
-    public int getLevel() {
-        return 0;
+    private final Map<String, Object> properties = new HashMap<>();
+
+    public GraphMLElement() {
     }
+
+    public String getId() {
+        return getProperty(GraphMLProperties.ID);
+    }
+
+    public String getNamespace() {
+        return getProperty(GraphMLProperties.NAMESPACE);
+    }
+
+    public <T> T getProperty(String key) {
+        return (T) properties.get(key);
+    }
+
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+    public HashMap<String, Object> getProperties() {
+        return new HashMap<>(properties);
+    }
+
+    public abstract <T> T accept(GraphMLElementVisitor<T> visitor);
+
 }

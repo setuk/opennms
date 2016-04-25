@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2012-2014 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
+ * Copyright (C) 2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,32 +26,44 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.topology.plugins.widget.internal;
+package org.opennms.features.topology.graphml;
 
-import org.opennms.features.topology.api.IViewContribution;
-import org.opennms.features.topology.api.WidgetContext;
+import java.util.Objects;
 
+public class GraphMLEdge extends GraphMLElement {
 
-import com.vaadin.server.Resource;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
+    private GraphMLNode target;
+    private GraphMLNode source;
 
-public class BottomSimpleViewContribution implements IViewContribution {
+    public GraphMLEdge() {
+    }
 
-    @Override
-    public Component getView(WidgetContext widgetContext) {
-        
-        return new Label("This is a test for the bottom view");
+    public GraphMLNode getTarget() {
+        return target;
+    }
+
+    public GraphMLNode getSource() {
+        return source;
+    }
+
+    public String getLabel() {
+        return getProperty(GraphMLProperties.LABEL);
+    }
+
+    public String getTooltipText() {
+        return getProperty(GraphMLProperties.TOOLTIP_TEXT);
+    }
+
+    public void setTarget(GraphMLNode target) {
+        this.target = Objects.requireNonNull(target);
+    }
+
+    public void setSource(GraphMLNode source) {
+        this.source = Objects.requireNonNull(source);
     }
 
     @Override
-    public String getTitle() {
-        return "Test Widget";
+    public <T> T accept(GraphMLElementVisitor<T> visitor) {
+        return visitor.visit(this);
     }
-
-    @Override
-    public Resource getIcon() {
-        return null;
-    }
-
 }

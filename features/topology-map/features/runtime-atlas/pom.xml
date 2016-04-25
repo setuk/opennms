@@ -42,10 +42,19 @@
       <type>xml</type>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.opennms.features.topology.plugins.topo</groupId>
       <artifactId>atlas</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.features.topology</groupId>
+      <artifactId>graphml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.graphdrawing.graphml</groupId>
+      <artifactId>graphml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
