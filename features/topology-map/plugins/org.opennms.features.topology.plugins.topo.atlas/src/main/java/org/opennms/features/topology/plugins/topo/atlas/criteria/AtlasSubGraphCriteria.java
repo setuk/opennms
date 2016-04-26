@@ -29,45 +29,41 @@
 package org.opennms.features.topology.plugins.topo.atlas.criteria;
 
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.opennms.features.topology.api.support.VertexHopGraphProvider;
-import org.opennms.features.topology.api.topo.VertexRef;
-import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
-import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
+import org.opennms.features.topology.api.NamespaceAware;
+import org.opennms.features.topology.api.topo.Criteria;
 
-public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCriteria {
-    private final AtlasTopologyProvider topologyProvider;
+public class AtlasSubGraphCriteria extends Criteria implements NamespaceAware {
     private final String subGraphId;
+    private final String namespace;
 
-    public AtlasSubGraphCriteria(final AtlasTopologyProvider topologyProvider, final String subGraphId) {
-        super("Sub-graph " + subGraphId);
-        this.topologyProvider = topologyProvider;
+    public AtlasSubGraphCriteria(final String namespace, final String subGraphId) {
         this.subGraphId = subGraphId;
-    }
-
-    public AtlasTopologyProvider getTopologyProvider() {
-        return topologyProvider;
-    }
-
-    public String getSubGraphId() {
-        return subGraphId;
+        this.namespace = namespace;
     }
 
     @Override
-    public Set<VertexRef> getVertices() {
-        return topologyProvider.getVertices().stream().filter(vx -> subGraphId.equals(((DefaultAtlasVertex) vx).getSubGraphId())).collect(Collectors.toSet());
+    public ElementType getType() {
+        return ElementType.GRAPH;
     }
 
     @Override
     public String getNamespace() {
-        return topologyProvider.getVertexNamespace();
+        return namespace;
+    }
+
+    @Override
+    public boolean contributesTo(String namespace) {
+        return getNamespace().equals(namespace);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subGraphId, topologyProvider);
+        return Objects.hash(namespace, subGraphId);
+    }
+
+    public String getSubGraphId() {
+        return subGraphId;
     }
 
     @Override
@@ -79,9 +75,12 @@ public class AtlasSubGraphCriteria extends VertexHopGraphProvider.VertexHopCrite
             return true;
         }
         if (obj instanceof AtlasSubGraphCriteria) {
-            return Objects.equals(topologyProvider, ((AtlasSubGraphCriteria) obj).getTopologyProvider()) &&
-                    Objects.equals(subGraphId, ((AtlasSubGraphCriteria) obj).getSubGraphId());
+            AtlasSubGraphCriteria other = (AtlasSubGraphCriteria) obj;
+            boolean equals = Objects.equals(namespace, other.namespace)
+                    && Objects.equals(subGraphId, other.subGraphId);
+            return equals;
         }
         return false;
     }
+
 }

@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -46,6 +47,7 @@ import javax.xml.bind.Unmarshaller;
 import org.opennms.features.topology.api.support.VertexHopGraphProvider;
 import org.opennms.features.topology.api.topo.AbstractTopologyProvider;
 import org.opennms.features.topology.api.topo.AbstractVertex;
+import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.GraphProvider;
 import org.opennms.features.topology.api.topo.SearchProvider;
@@ -73,6 +75,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public abstract class AbstractLinkdTopologyProvider extends AbstractTopologyProvider implements GraphProvider,  SearchProvider {
 
@@ -425,26 +428,28 @@ public abstract class AbstractLinkdTopologyProvider extends AbstractTopologyProv
     public abstract void load(String filename) throws MalformedURLException, JAXBException;
 
     @Override
-    public VertexHopGraphProvider.VertexHopCriteria getDefaultCriteria() {
+    public Set<Criteria> getDefaultCriteria() {
         final OnmsNode node = m_topologyDao.getDefaultFocusPoint();
 
         VertexHopGraphProvider.VertexHopCriteria criterion = null;
 
         if (node != null) {
             String ip = null;
-            boolean isManaged= false;
+            boolean isManaged = false;
             final OnmsIpInterface ipInterface = getAddress(node.getId());
             if (ipInterface != null && ipInterface.getIpAddress() != null) {
                 ip = ipInterface.getIpAddress().getHostAddress();
                 isManaged = ipInterface.isManaged();
             }
-            final Vertex defaultVertex = getVertex(node.getId(),ip,node.getSysObjectId(),node.getLabel(),getNodeTooltipDefaultText(ip,node.getLabel(),isManaged,node.getSysLocation(),node.getType()));
+            final Vertex defaultVertex = getVertex(node.getId(), ip, node.getSysObjectId(), node.getLabel(), getNodeTooltipDefaultText(ip, node.getLabel(), isManaged, node.getSysLocation(), node.getType()));
             if (defaultVertex != null) {
                 criterion = new LinkdHopCriteria(node.getNodeId(), node.getLabel(), m_nodeDao);
             }
         }
-
-        return criterion;
+        if (criterion != null) {
+            return Sets.newHashSet(criterion);
+        }
+        return null;
     }
 
     protected void addNodesWithoutLinks() {

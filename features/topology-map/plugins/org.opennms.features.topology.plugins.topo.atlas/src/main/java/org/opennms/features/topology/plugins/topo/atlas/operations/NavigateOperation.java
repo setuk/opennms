@@ -29,12 +29,14 @@
 package org.opennms.features.topology.plugins.topo.atlas.operations;
 
 import java.util.List;
+import java.util.Set;
 
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
-import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
 import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
 
 import com.google.common.base.Strings;
@@ -46,7 +48,7 @@ public class NavigateOperation implements Operation {
     public NavigateOperation(final AtlasTopologyProvider topologyProvider) {
         this.topologyProvider = topologyProvider;
     }
-    
+
     @Override
     public boolean display(List<VertexRef> targets, OperationContext operationContext) {
         return true;
@@ -54,8 +56,9 @@ public class NavigateOperation implements Operation {
 
     @Override
     public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
-    	if (targets.size() == 1) {
-            return !Strings.isNullOrEmpty(((DefaultAtlasVertex) topologyProvider.getVertex(targets.get(0))).getGlue());
+    	if (targets.size() == 1 && targets.get(0) instanceof DefaultAtlasVertex) {
+            GraphContainer graphContainer = operationContext.getGraphContainer();
+            return !Strings.isNullOrEmpty(((DefaultAtlasVertex) graphContainer.getBaseTopology().getVertex(targets.get(0))).getGlue());
         }
 
         return false;
@@ -68,11 +71,17 @@ public class NavigateOperation implements Operation {
 
     @Override
     public void execute(List<VertexRef> targets, OperationContext operationContext) {
-        final DefaultAtlasVertex vertex = (DefaultAtlasVertex) topologyProvider.getVertex(targets.get(0));
+        final DefaultAtlasVertex vertex = (DefaultAtlasVertex) operationContext.getGraphContainer().getBaseTopology().getVertex(targets.get(0));
         if (!Strings.isNullOrEmpty(vertex.getGlue())) {
-            operationContext.getGraphContainer().clearCriteria();
-            operationContext.getGraphContainer().addCriteria(new AtlasSubGraphCriteria(topologyProvider, vertex.getGlue()));
-            operationContext.getGraphContainer().redoLayout();
+            navigateTo(operationContext.getGraphContainer(), vertex.getGlue());
         }
+    }
+    public void navigateTo(GraphContainer container, String glue) {
+        container.clearCriteria();
+        Set<Criteria> defaultCriteriaSet = AtlasTopologyProvider.createDefaultCriteriaSet(topologyProvider, glue);
+        for (Criteria eachCriteria : defaultCriteriaSet) {
+            container.addCriteria(eachCriteria);
+        }
+        container.redoLayout();
     }
 }

@@ -30,6 +30,7 @@ package org.opennms.features.topology.app.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
@@ -73,7 +74,7 @@ public class TestTopologyProvider extends AbstractTopologyProvider implements Gr
     }
 
     @Override
-    public Criteria getDefaultCriteria() {
+    public Set<Criteria> getDefaultCriteria() {
         return null;
     }
 

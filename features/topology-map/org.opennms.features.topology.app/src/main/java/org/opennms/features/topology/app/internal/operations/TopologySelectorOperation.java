@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,6 +43,7 @@ import org.opennms.features.topology.api.CheckedOperation;
 import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.LayoutAlgorithm;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.EdgeStatusProvider;
 import org.opennms.features.topology.api.topo.GraphProvider;
 import org.opennms.features.topology.api.topo.StatusProvider;
@@ -114,7 +116,10 @@ public class TopologySelectorOperation extends AbstractCheckedOperation {
 			if (resetCriteriaAndSzl) {
 				container.clearCriteria(); // remove all criteria
 				container.setSemanticZoomLevel(1); // reset to 1
-				container.addCriteria(container.getBaseTopology().getDefaultCriteria());
+				Set<Criteria> defaultCriteria = container.getBaseTopology().getDefaultCriteria();
+				if (defaultCriteria != null) {
+					defaultCriteria.forEach(eachCriteria -> container.addCriteria(eachCriteria));
+				}
 			}
             container.redoLayout();
         }

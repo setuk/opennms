@@ -581,7 +581,10 @@ public class TopologyUI extends UI implements CommandUpdateListener, MenuItemUpd
 
         // Add the default criteria if we do not have already a criteria set
         if (getWrappedVertexHopCriteria(m_graphContainer).isEmpty() && noAdditionalFocusCriteria()) {
-            m_graphContainer.addCriteria(m_graphContainer.getBaseTopology().getDefaultCriteria()); // set default
+            Set<Criteria> defaultCriteria = m_graphContainer.getBaseTopology().getDefaultCriteria();
+            if (defaultCriteria != null) {
+                defaultCriteria.forEach(eachCriteria -> m_graphContainer.addCriteria(eachCriteria));
+            }
         }
 
         // If no Topology Provider was selected (due to loadUserSettings(), fallback to default

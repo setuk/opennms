@@ -30,6 +30,7 @@ package org.opennms.features.topology.api.topo;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -65,7 +66,7 @@ public class AbstractTopologyProviderTest {
             }
 
             @Override
-            public Criteria getDefaultCriteria() {
+            public Set<Criteria> getDefaultCriteria() {
                 return null;  // no default
             }
 

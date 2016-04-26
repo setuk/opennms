@@ -28,6 +28,11 @@
 
 package org.opennms.features.topology.app.internal.ui;
 
+import java.util.Set;
+
+import org.opennms.features.topology.api.GraphContainer;
+import org.opennms.features.topology.api.topo.Criteria;
+
 import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -35,8 +40,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.opennms.features.topology.api.GraphContainer;
-import org.opennms.features.topology.api.topo.Criteria;
 
 public class NoContentAvailableWindow extends Window {
 
@@ -74,17 +77,18 @@ public class NoContentAvailableWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Criteria defaultCriteria = graphContainer.getBaseTopology().getDefaultCriteria();
-                if (defaultCriteria != null) {
+                Set<Criteria> defaultCriteria = graphContainer.getBaseTopology().getDefaultCriteria();
+                if (defaultCriteria != null && !defaultCriteria.isEmpty()) {
                     // check if there is already a criteria registered for focus vertices. If so, remove them
-                	Criteria[] allCriteria = graphContainer.getCriteria();
-                	for (Criteria criterion : allCriteria) {
-						graphContainer.removeCriteria(criterion);
-					}
-
-                    graphContainer.addCriteria(defaultCriteria); // add default criteria
-                    graphContainer.redoLayout(); // we need to redo the layout
-                    noDefaultsAvailable.setVisible(false);
+                    Criteria[] allCriteria = graphContainer.getCriteria();
+                    for (Criteria criterion : allCriteria) {
+                        graphContainer.removeCriteria(criterion);
+                    }
+                    for (Criteria eachCriteria : defaultCriteria) {
+                        graphContainer.addCriteria(eachCriteria); // add default criteria
+                        graphContainer.redoLayout(); // we need to redo the layout
+                        noDefaultsAvailable.setVisible(false);
+                    }
                 } else {
                     noDefaultsAvailable.setVisible(true);
                 }

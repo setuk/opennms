@@ -98,11 +98,11 @@ public class ApplicationTopologyProvider extends AbstractTopologyProvider implem
     }
 
     @Override
-    public Criteria getDefaultCriteria() {
+    public Set<Criteria> getDefaultCriteria() {
         // Only show the first application by default
         List<OnmsApplication> applications = applicationDao.findAll();
         if (!applications.isEmpty()) {
-            return new VertexHopGraphProvider.DefaultVertexHopCriteria(new ApplicationVertex(applications.get(0)));
+            return Sets.newHashSet(new VertexHopGraphProvider.DefaultVertexHopCriteria(new ApplicationVertex(applications.get(0))));
         }
         return null;
     }

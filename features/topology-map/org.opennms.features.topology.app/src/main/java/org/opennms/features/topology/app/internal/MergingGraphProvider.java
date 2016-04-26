@@ -390,7 +390,7 @@ public class MergingGraphProvider implements GraphProvider, VertexListener, Edge
 	}
 
     @Override
-    public Criteria getDefaultCriteria() {
+    public Set<Criteria> getDefaultCriteria() {
         return m_baseGraphProvider.getDefaultCriteria();
     }
 
@@ -702,7 +702,7 @@ public class MergingGraphProvider implements GraphProvider, VertexListener, Edge
 		}
 
         @Override
-        public Criteria getDefaultCriteria() {
+        public Set<Criteria> getDefaultCriteria() {
             return null;
         }
 

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
@@ -90,7 +91,7 @@ public class SFreeTopologyProvider extends AbstractTopologyProvider implements G
     }
 
     @Override
-    public Criteria getDefaultCriteria() {
+    public Set<Criteria> getDefaultCriteria() {
         return null; // no default focus
     }
 

@@ -32,7 +32,7 @@ http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.
 	<service interface="org.opennms.features.topology.api.topo.GraphProvider" ref="atlasTopologyHopProvider">
 		<service-properties>
 			<entry key="label" value="Atlas Topology" />
-			<entry key="preferredLayout" value="Hierarchy Layout" />
+			<entry key="preferredLayout" value="D3 Layout" />
 		</service-properties>
 	</service>
 
@@ -46,5 +46,13 @@ http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.
 			<entry key="operation.contextMenuLocation" value=""/>
 			<entry key="operation.label" value="Navigate to"/>
 		</service-properties>
+	</service>
+
+	<!-- Info Items -->
+	<bean id="navigationInfoPanelItem" class="org.opennms.features.topology.plugins.topo.atlas.info.NavigationInfoPanelItem" >
+		<argument ref="atlasTopologyProvider" />
+	</bean>
+	<service interface="org.opennms.features.topology.api.info.InfoPanelItem" ref="navigationInfoPanelItem">
+
 	</service>
 </blueprint>

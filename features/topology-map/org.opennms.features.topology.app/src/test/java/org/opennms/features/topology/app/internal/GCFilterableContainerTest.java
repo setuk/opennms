@@ -30,6 +30,7 @@ package org.opennms.features.topology.app.internal;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -64,7 +65,7 @@ public class GCFilterableContainerTest {
 
             @Override public void save() { }
             @Override public void refresh() { }
-            @Override public Criteria getDefaultCriteria() { return null; }
+            @Override public Set<Criteria> getDefaultCriteria() { return null; }
 
             @Override public void load(String filename) throws MalformedURLException, JAXBException {
                 resetContainer();

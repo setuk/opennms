@@ -32,12 +32,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
+import org.opennms.features.topology.api.support.VertexHopGraphProvider;
 import org.opennms.features.topology.api.topo.AbstractEdge;
 import org.opennms.features.topology.api.topo.AbstractTopologyProvider;
 import org.opennms.features.topology.api.topo.Criteria;
@@ -150,18 +155,8 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
     }
 
     @Override
-    public Criteria getDefaultCriteria() {
-        if (defaultSubGraphId != null) {
-            return new AtlasSubGraphCriteria(this, defaultSubGraphId);
-        }
-        DefaultAtlasVertex defaultVertex = getVertices().stream()
-                .map(v -> (DefaultAtlasVertex) v)
-                .filter(v -> v.getGlue() == null)
-                .findFirst().orElse(null);
-        if (defaultVertex != null) {
-            return new AtlasSubGraphCriteria(this, defaultVertex.getSubGraphId());
-        }
-        return null;
+    public Set<Criteria> getDefaultCriteria() {
+        return createDefaultCriteriaSet(this, defaultSubGraphId);
     }
 
     @Override
@@ -172,5 +167,27 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
     @Override
     public boolean contributesTo(ContentType type) {
         return false;
+    }
+
+    public String getDefaultSubGraphId() {
+        return defaultSubGraphId;
+    }
+
+    public static Set<Criteria> createDefaultCriteriaSet(GraphProvider graphProvider, String subgraphId) {
+        Set<Criteria> criteriaSet = new HashSet<>();
+
+        if (subgraphId != null) {
+            criteriaSet.add(new AtlasSubGraphCriteria(graphProvider.getVertexNamespace(), subgraphId));
+        }
+        List<DefaultAtlasVertex> vertices = graphProvider.getVertices().stream()
+                .map(v -> (DefaultAtlasVertex) v)
+                .filter(v -> Objects.equals(subgraphId, v.getSubGraphId()))
+                .collect(Collectors.toList());
+        if (!vertices.isEmpty()) {
+            for (DefaultAtlasVertex eachVertex : vertices) {
+                criteriaSet.add(new VertexHopGraphProvider.DefaultVertexHopCriteria(eachVertex));
+            }
+        }
+        return criteriaSet;
     }
 }
