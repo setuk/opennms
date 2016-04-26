@@ -28,15 +28,16 @@
 
 package org.opennms.features.topology.plugins.topo.atlas.operations;
 
+import static org.opennms.features.topology.api.support.VertexHopGraphProvider.VertexHopCriteria;
+
 import java.util.List;
-import java.util.Set;
 
 import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
-import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
+import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
 import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
 
 import com.google.common.base.Strings;
@@ -73,13 +74,19 @@ public class NavigateOperation implements Operation {
     public void execute(List<VertexRef> targets, OperationContext operationContext) {
         final DefaultAtlasVertex vertex = (DefaultAtlasVertex) operationContext.getGraphContainer().getBaseTopology().getVertex(targets.get(0));
         if (!Strings.isNullOrEmpty(vertex.getGlue())) {
-            navigateTo(operationContext.getGraphContainer(), vertex.getGlue());
+            navigateTo(operationContext.getGraphContainer(), vertex, vertex.getGlue());
         }
     }
-    public void navigateTo(GraphContainer container, String glue) {
+
+    public void navigateTo(GraphContainer container, DefaultAtlasVertex vertex, String subGraphId) {
+        AtlasSubGraphCriteria atlasSubGraphCriteria = VertexHopCriteria.getSingleCriteriaForGraphContainer(container, AtlasSubGraphCriteria.class, false);
+        if (atlasSubGraphCriteria != null) {
+            atlasSubGraphCriteria.setNewRoot(vertex);
+        }
         container.clearCriteria();
-        Set<Criteria> defaultCriteriaSet = AtlasTopologyProvider.createDefaultCriteriaSet(topologyProvider, glue);
-        for (Criteria eachCriteria : defaultCriteriaSet) {
+        container.addCriteria(atlasSubGraphCriteria);
+        List<VertexHopCriteria> hopCriterias = AtlasTopologyProvider.getFocusVertices(topologyProvider, subGraphId);
+        for (VertexHopCriteria eachCriteria : hopCriterias) {
             container.addCriteria(eachCriteria);
         }
         container.redoLayout();

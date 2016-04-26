@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -156,7 +157,15 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
 
     @Override
     public Set<Criteria> getDefaultCriteria() {
-        return createDefaultCriteriaSet(this, defaultSubGraphId);
+        Set<Criteria> criteriaSet = new HashSet<>();
+
+        if (defaultSubGraphId != null) {
+            AtlasSubGraphCriteria subGraphCriteria = new AtlasSubGraphCriteria(getVertexNamespace());
+            subGraphCriteria.setNewRoot(new DefaultAtlasVertex(getVertexNamespace(), defaultSubGraphId, "Regions", defaultSubGraphId, defaultSubGraphId));
+            criteriaSet.add(subGraphCriteria);
+        }
+        criteriaSet.addAll(getFocusVertices(this, defaultSubGraphId));
+        return criteriaSet;
     }
 
     @Override
@@ -169,25 +178,17 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
         return false;
     }
 
-    public String getDefaultSubGraphId() {
-        return defaultSubGraphId;
-    }
-
-    public static Set<Criteria> createDefaultCriteriaSet(GraphProvider graphProvider, String subgraphId) {
-        Set<Criteria> criteriaSet = new HashSet<>();
-
-        if (subgraphId != null) {
-            criteriaSet.add(new AtlasSubGraphCriteria(graphProvider.getVertexNamespace(), subgraphId));
-        }
-        List<DefaultAtlasVertex> vertices = graphProvider.getVertices().stream()
+    public static List<VertexHopGraphProvider.VertexHopCriteria> getFocusVertices(GraphProvider topologyProvider, String defaultSubGraphId) {
+        List<VertexHopGraphProvider.VertexHopCriteria> hopCriterias = new ArrayList<>();
+        List<DefaultAtlasVertex> vertices = topologyProvider.getVertices().stream()
                 .map(v -> (DefaultAtlasVertex) v)
-                .filter(v -> Objects.equals(subgraphId, v.getSubGraphId()))
+                .filter(v -> Objects.equals(defaultSubGraphId, v.getSubGraphId()))
                 .collect(Collectors.toList());
         if (!vertices.isEmpty()) {
             for (DefaultAtlasVertex eachVertex : vertices) {
-                criteriaSet.add(new VertexHopGraphProvider.DefaultVertexHopCriteria(eachVertex));
+                hopCriterias.add(new VertexHopGraphProvider.DefaultVertexHopCriteria(eachVertex));
             }
         }
-        return criteriaSet;
+        return hopCriterias;
     }
 }

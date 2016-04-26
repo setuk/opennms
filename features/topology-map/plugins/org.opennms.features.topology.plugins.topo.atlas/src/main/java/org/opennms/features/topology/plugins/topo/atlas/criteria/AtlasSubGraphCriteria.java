@@ -28,18 +28,34 @@
 
 package org.opennms.features.topology.plugins.topo.atlas.criteria;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.opennms.features.topology.api.NamespaceAware;
 import org.opennms.features.topology.api.topo.Criteria;
+import org.opennms.features.topology.plugins.topo.atlas.vertices.DefaultAtlasVertex;
 
 public class AtlasSubGraphCriteria extends Criteria implements NamespaceAware {
-    private final String subGraphId;
     private final String namespace;
 
-    public AtlasSubGraphCriteria(final String namespace, final String subGraphId) {
-        this.subGraphId = subGraphId;
+    private List<DefaultAtlasVertex> vertices = new ArrayList<>();
+
+    public AtlasSubGraphCriteria(final String namespace) {
         this.namespace = namespace;
+    }
+
+    public void setNewRoot(DefaultAtlasVertex vertex) {
+        if (vertices.contains(vertex)) {
+            int index = vertices.indexOf(vertex);
+            vertices = vertices.subList(0, index + 1);
+        } else {
+            vertices.add(vertex);
+        }
+    }
+
+    public List<DefaultAtlasVertex> getVertices() {
+        return vertices;
     }
 
     @Override
@@ -59,11 +75,7 @@ public class AtlasSubGraphCriteria extends Criteria implements NamespaceAware {
 
     @Override
     public int hashCode() {
-        return Objects.hash(namespace, subGraphId);
-    }
-
-    public String getSubGraphId() {
-        return subGraphId;
+        return Objects.hash(namespace, vertices);
     }
 
     @Override
@@ -77,10 +89,9 @@ public class AtlasSubGraphCriteria extends Criteria implements NamespaceAware {
         if (obj instanceof AtlasSubGraphCriteria) {
             AtlasSubGraphCriteria other = (AtlasSubGraphCriteria) obj;
             boolean equals = Objects.equals(namespace, other.namespace)
-                    && Objects.equals(subGraphId, other.subGraphId);
+                    && Objects.equals(vertices, other.vertices);
             return equals;
         }
         return false;
     }
-
 }

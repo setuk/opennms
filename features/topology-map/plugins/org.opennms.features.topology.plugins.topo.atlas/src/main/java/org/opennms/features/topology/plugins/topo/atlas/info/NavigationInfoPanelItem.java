@@ -28,14 +28,9 @@
 
 package org.opennms.features.topology.plugins.topo.atlas.info;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.info.InfoPanelItem;
 import org.opennms.features.topology.api.support.VertexHopGraphProvider;
-import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.plugins.topo.atlas.AtlasTopologyProvider;
 import org.opennms.features.topology.plugins.topo.atlas.criteria.AtlasSubGraphCriteria;
 import org.opennms.features.topology.plugins.topo.atlas.operations.NavigateOperation;
@@ -58,40 +53,25 @@ public class NavigationInfoPanelItem implements InfoPanelItem {
     @Override
     public Component getComponent(GraphContainer container) {
         final AtlasSubGraphCriteria criteria = VertexHopGraphProvider.VertexHopCriteria.getSingleCriteriaForGraphContainer(container, AtlasSubGraphCriteria.class, false);
-        final String namespace = container.getBaseTopology().getVertexNamespace();
-        final List<String[]> breadcrumList = new ArrayList<>();
 
-        String subgraphId = criteria.getSubGraphId();
-        Vertex vertex = topologyProvider.getVertices().stream()
-                .filter(v -> v instanceof DefaultAtlasVertex)
-                .map(v -> (DefaultAtlasVertex) v)
-                .filter(v -> Objects.equals(criteria.getSubGraphId(), v.getGlue()))
-                .findFirst().orElse(null);
-        while (vertex != null) {
-            String caption = vertex.getLabel();
-            breadcrumList.add(new String[]{caption, subgraphId});
-            subgraphId = subgraphId.substring(0, subgraphId.lastIndexOf("."));
-            vertex = container.getBaseTopology().getVertex(namespace, subgraphId);
-        }
-
+        // Path elements of Navigation
         final HorizontalLayout navigationLayout = new HorizontalLayout();
         navigationLayout.setSpacing(true);
-        Button button = createButton(topologyProvider, container, "Regions", "regions");
-        navigationLayout.addComponent(button);
-
-        for (int i=0; i<breadcrumList.size(); i++) {
-            navigationLayout.addComponent(new Label(">"));
-            String[] strings = breadcrumList.get(i);
-            navigationLayout.addComponent(createButton(topologyProvider, container, strings[0], strings[1]));
+        for (DefaultAtlasVertex eachAtlasVertex : criteria.getVertices()) {
+            if (navigationLayout.getComponentCount() >= 1) {
+                navigationLayout.addComponent(new Label(" > "));
+            }
+            navigationLayout.addComponent(createButton(topologyProvider, container, eachAtlasVertex, eachAtlasVertex.getGlue()));
         }
+
         return navigationLayout;
     }
 
-    private static Button createButton(AtlasTopologyProvider topologyProvider, GraphContainer container, String caption, String subgraphId) {
+    private static Button createButton(AtlasTopologyProvider topologyProvider, GraphContainer container, DefaultAtlasVertex vertex, String subgraphId) {
         Button button = new Button();
         button.addStyleName(BaseTheme.BUTTON_LINK);
-        button.addClickListener((event) -> new NavigateOperation(topologyProvider).navigateTo(container, subgraphId));
-        button.setCaption(caption);
+        button.addClickListener((event) -> new NavigateOperation(topologyProvider).navigateTo(container, vertex, subgraphId));
+        button.setCaption(vertex.getLabel());
         return button;
     }
 
