@@ -28,6 +28,7 @@
 
 package org.opennms.features.topology.plugins.topo.atlas;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,7 +97,12 @@ public class AtlasTopologyProvider extends AbstractTopologyProvider implements G
     @Override
     public void load(final String filename) throws MalformedURLException, JAXBException {
         resetContainer();
-        try (InputStream input = new FileInputStream("/Users/mvrueden/Desktop/test.graphml")) {
+        File file = new File(System.getProperty("opennms.home"), "etc/test.graphml");
+        if (!file.exists()) {
+            LOG.warn("No graph found at location " + file.toString());
+            return;
+        }
+        try (InputStream input = new FileInputStream(file)) {
             GraphML graphML = GraphMLReader.read(input);
             defaultSubGraphId = graphML.getProperty("defaultSubGraph");
             final String namespace = graphML.getNamespace();
