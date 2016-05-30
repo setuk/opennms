@@ -779,6 +779,7 @@ public class VTopologyComponent extends Composite implements SVGTopologyMap, Top
             String ttText = sharedEdge.getTooltipText();
             edge.setTooltipText(ttText);
             edge.setStatus(sharedEdge.getStatus());
+			edge.setAdditionalStyling(JavaScriptHelper.toJavaScriptObject(sharedEdge.getAdditionalStyling()));
             graph.addEdge(edge);
 		}
 		

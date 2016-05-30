@@ -33,10 +33,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.opennms.features.topology.api.topo.EdgeStatusProvider;
 import org.opennms.features.topology.api.topo.MetaTopologyProvider;
 import org.opennms.features.topology.api.topo.SearchProvider;
+import org.opennms.features.topology.api.topo.StatusProvider;
+import org.opennms.features.topology.plugins.topo.graphml.GraphMLEdgeStatusProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLMetaTopologyProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLSearchProvider;
+import org.opennms.features.topology.plugins.topo.graphml.GraphMLTopologyProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -58,6 +62,7 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 	private Map<String, GraphMLMetaTopologyProvider> m_providers = Maps.newHashMap();
 	private Map<String, ServiceRegistration<MetaTopologyProvider>> m_registrations =  Maps.newHashMap();
 	private Map<String, List<ServiceRegistration<SearchProvider>>> m_searchProviders = Maps.newHashMap();
+	private Map<String, List<ServiceRegistration<EdgeStatusProvider>>> m_edgeStatusProvider = Maps.newHashMap();
 
 	public void setBundleContext(BundleContext bundleContext) {
 		m_bundleContext = bundleContext;
@@ -89,13 +94,22 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 			m_registrations.put(pid, registration);
 			m_providers.put(pid, metaTopologyProvider);
 
-			// Create and register a SearchProvider for each GraphMLTopologyProvider
+			// Create and register additional services
 			m_searchProviders.putIfAbsent(pid, Lists.newArrayList());
+			m_edgeStatusProvider.putIfAbsent(pid, Lists.newArrayList());
 			metaTopologyProvider.getGraphProviders().forEach(it -> {
-				GraphMLSearchProvider searchProvider = new GraphMLSearchProvider(metaTopologyProvider.getRawTopologyProvider(it.getVertexNamespace()));
+				GraphMLTopologyProvider rawTopologyProvider = metaTopologyProvider.getRawTopologyProvider(it.getVertexNamespace());
+
+				// SearchProvider
+				GraphMLSearchProvider searchProvider = new GraphMLSearchProvider(rawTopologyProvider);
 				ServiceRegistration<SearchProvider> searchProviderServiceRegistration = m_bundleContext.registerService(SearchProvider.class, searchProvider, new Hashtable<>());
 				m_searchProviders.get(pid).add(searchProviderServiceRegistration);
+
+				// EdgeStatusProvider
+				ServiceRegistration<EdgeStatusProvider> edgeStatusProviderServiceRegistration = m_bundleContext.registerService(EdgeStatusProvider.class, new GraphMLEdgeStatusProvider(rawTopologyProvider), new Hashtable<>());
+				m_edgeStatusProvider.get(pid).add(edgeStatusProviderServiceRegistration);
 			});
+
 		} else {
 			LOG.debug("Service with pid '{}' updated. Updating properties.", pid);
 			m_providers.get(pid).setTopologyLocation(location);
@@ -119,6 +133,8 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 			m_providers.remove(pid);
 			m_searchProviders.get(pid).forEach(eachServiceRegistration -> eachServiceRegistration.unregister());
 			m_searchProviders.remove(pid);
+			m_edgeStatusProvider.get(pid).forEach(eachServiceRegistration -> eachServiceRegistration.unregister());
+			m_edgeStatusProvider.remove(pid);
 		}
 	}
 }
