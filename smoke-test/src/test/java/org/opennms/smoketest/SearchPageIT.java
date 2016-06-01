@@ -34,11 +34,15 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SearchPageIT extends OpenNMSSeleniumTestCase {
     @Before
     public void setUp() throws Exception {
+        deleteTestRequisition();
         searchPage();
     }
 
@@ -84,4 +88,11 @@ public class SearchPageIT extends OpenNMSSeleniumTestCase {
         findElementByXpath("//h3[text()='Assets']");
     }
 
+    @Test
+    public void testSearchMacAddress() throws Exception {
+        final WebElement maclike = enterText(By.cssSelector("input[name='maclike']"), "0");
+        maclike.sendKeys(Keys.ENTER);
+        findElementByXpath("//div[@id='content']/ol/li[text()='Node List']");
+        findElementByXpath("//h3[@class='panel-title']/span[text()='Nodes']");
+    }
 }
