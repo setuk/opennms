@@ -33,10 +33,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.opennms.features.topology.plugins.topo.graphml.internal.scripting.OSGiScriptEngineManager;
 import org.opennms.features.topology.api.topo.EdgeStatusProvider;
 import org.opennms.features.topology.api.topo.MetaTopologyProvider;
 import org.opennms.features.topology.api.topo.SearchProvider;
-import org.opennms.features.topology.api.topo.StatusProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLEdgeStatusProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLMetaTopologyProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLSearchProvider;
@@ -51,6 +51,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.springframework.transaction.support.TransactionOperations;
+
+import javax.script.ScriptEngineManager;
 
 public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 
@@ -59,6 +62,8 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 	private static final String LABEL = "label";
 
 	private BundleContext m_bundleContext;
+	private TransactionOperations m_transactionOperations;
+
 	private Map<String, GraphMLMetaTopologyProvider> m_providers = Maps.newHashMap();
 	private Map<String, ServiceRegistration<MetaTopologyProvider>> m_registrations =  Maps.newHashMap();
 	private Map<String, List<ServiceRegistration<SearchProvider>>> m_searchProviders = Maps.newHashMap();
@@ -66,6 +71,10 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 
 	public void setBundleContext(BundleContext bundleContext) {
 		m_bundleContext = bundleContext;
+	}
+
+	public void setTransactionOperations(final TransactionOperations transactionOperations) {
+		this.m_transactionOperations = transactionOperations;
 	}
 
 	@Override
@@ -94,6 +103,9 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 			m_registrations.put(pid, registration);
 			m_providers.put(pid, metaTopologyProvider);
 
+			// Create a OSGi aware script engine manager
+			final ScriptEngineManager scriptEngineManager = new OSGiScriptEngineManager(m_bundleContext);
+
 			// Create and register additional services
 			m_searchProviders.putIfAbsent(pid, Lists.newArrayList());
 			m_edgeStatusProvider.putIfAbsent(pid, Lists.newArrayList());
@@ -106,7 +118,11 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 				m_searchProviders.get(pid).add(searchProviderServiceRegistration);
 
 				// EdgeStatusProvider
-				ServiceRegistration<EdgeStatusProvider> edgeStatusProviderServiceRegistration = m_bundleContext.registerService(EdgeStatusProvider.class, new GraphMLEdgeStatusProvider(rawTopologyProvider), new Hashtable<>());
+				ServiceRegistration<EdgeStatusProvider> edgeStatusProviderServiceRegistration = m_bundleContext.registerService(EdgeStatusProvider.class,
+																																new GraphMLEdgeStatusProvider(rawTopologyProvider,
+																																							  scriptEngineManager,
+																																							  m_transactionOperations),
+																																new Hashtable<>());
 				m_edgeStatusProvider.get(pid).add(edgeStatusProviderServiceRegistration);
 			});
 
