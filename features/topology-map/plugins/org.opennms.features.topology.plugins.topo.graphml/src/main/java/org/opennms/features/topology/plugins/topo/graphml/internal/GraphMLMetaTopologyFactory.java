@@ -32,6 +32,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.opennms.features.topology.plugins.topo.graphml.internal.scripting.OSGiScriptEngineManager;
 import org.opennms.features.topology.api.topo.EdgeStatusProvider;
@@ -41,6 +42,8 @@ import org.opennms.features.topology.plugins.topo.graphml.GraphMLEdgeStatusProvi
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLMetaTopologyProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLSearchProvider;
 import org.opennms.features.topology.plugins.topo.graphml.GraphMLTopologyProvider;
+import org.opennms.netmgt.dao.api.NodeDao;
+import org.opennms.netmgt.measurements.api.MeasurementsService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -68,6 +71,8 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 	private Map<String, ServiceRegistration<MetaTopologyProvider>> m_registrations =  Maps.newHashMap();
 	private Map<String, List<ServiceRegistration<SearchProvider>>> m_searchProviders = Maps.newHashMap();
 	private Map<String, List<ServiceRegistration<EdgeStatusProvider>>> m_edgeStatusProvider = Maps.newHashMap();
+	private NodeDao nodeDao;
+	private MeasurementsService measurementsService;
 
 	public void setBundleContext(BundleContext bundleContext) {
 		m_bundleContext = bundleContext;
@@ -121,7 +126,9 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 				ServiceRegistration<EdgeStatusProvider> edgeStatusProviderServiceRegistration = m_bundleContext.registerService(EdgeStatusProvider.class,
 																																new GraphMLEdgeStatusProvider(rawTopologyProvider,
 																																							  scriptEngineManager,
-																																							  m_transactionOperations),
+																																							  m_transactionOperations,
+																																		                      nodeDao,
+																																		                      measurementsService),
 																																new Hashtable<>());
 				m_edgeStatusProvider.get(pid).add(edgeStatusProviderServiceRegistration);
 			});
@@ -137,6 +144,14 @@ public class GraphMLMetaTopologyFactory implements ManagedServiceFactory {
 			}
 			registration.setProperties(metaData);
 		}
+	}
+
+	public void setNodeDao(NodeDao nodeDao) {
+		this.nodeDao = Objects.requireNonNull(nodeDao);
+	}
+
+	public void setMeasurementsService(MeasurementsService measurementsService) {
+		this.measurementsService = Objects.requireNonNull(measurementsService);
 	}
 
 	@Override
