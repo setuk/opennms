@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opennms.core</groupId>
 	<artifactId>org.opennms.core.config</artifactId>
-	<name>OpenNMS Core Configuration Library</name>
+	<name>OpenNMS :: Core :: Configuration</name>
 	<packaging>bundle</packaging>
 	<build>
 		<plugins>
