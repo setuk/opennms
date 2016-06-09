@@ -49,10 +49,5 @@
       <artifactId>org.opennms.core.test-api.lib</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opennms</groupId>
-      <artifactId>opennms-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    </dependencies>
+  </dependencies>
 </project>

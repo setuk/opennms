@@ -286,11 +286,6 @@
             <artifactId>org.opennms.core.test-api.http</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opennms</groupId>
-            <artifactId>opennms-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.opennms.dependencies</groupId>
             <artifactId>camel-test-dependencies</artifactId>
             <type>pom</type>

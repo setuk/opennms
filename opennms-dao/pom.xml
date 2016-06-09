@@ -179,11 +179,6 @@
       <artifactId>spring-dependencies</artifactId>
       <type>pom</type>
     </dependency>
-    <dependency>
-      <groupId>org.opennms</groupId>
-      <artifactId>opennms-test</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- for validating marshalled events -->
     <dependency>
       <groupId>org.opennms</groupId>
