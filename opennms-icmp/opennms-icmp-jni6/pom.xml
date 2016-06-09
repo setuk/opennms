@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-icmp-jni6</artifactId>
-  <name>OpenNMS ICMP Pinger - JNIv6 implementation</name>
+  <name>OpenNMS :: ICMP :: JNIv6</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>

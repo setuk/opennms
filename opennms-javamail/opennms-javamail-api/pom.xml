@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-javamail-api</artifactId>
-  <name>OpenNMS JavaMail Interface</name>
+  <name>OpenNMS :: JavaMail :: Interface</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>

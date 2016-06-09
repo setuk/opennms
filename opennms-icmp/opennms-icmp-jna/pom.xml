@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-icmp-jna</artifactId>
-  <name>OpenNMS ICMP Pinger - JNA implementation</name>
+  <name>OpenNMS :: ICMP :: JNA</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>

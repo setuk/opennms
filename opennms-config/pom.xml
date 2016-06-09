@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-config</artifactId>
-  <name>OpenNMS Configuration</name>
+  <name>OpenNMS :: Model :: Config DAO :: Impl</name>
   <packaging>bundle</packaging>
   <properties>
     <skipITs>true</skipITs>

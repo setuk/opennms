@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-model</artifactId>
-  <name>OpenNMS Data Model Components</name>
+  <name>OpenNMS :: Model :: Objects</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>

@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-icmp-jni</artifactId>
-  <name>OpenNMS ICMP Pinger - JNI implementation</name>
+  <name>OpenNMS :: ICMP :: JNI</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>
