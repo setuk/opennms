@@ -57,10 +57,5 @@
       <artifactId>org.opennms.core.test-api.lib</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
 </project>

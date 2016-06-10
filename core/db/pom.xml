@@ -108,10 +108,6 @@
       <artifactId>org.opennms.core.xml</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opennms.core.test-api</groupId>
       <artifactId>org.opennms.core.test-api.lib</artifactId>
     </dependency>

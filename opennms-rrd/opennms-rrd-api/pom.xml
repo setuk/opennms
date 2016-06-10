@@ -41,11 +41,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.opennms</groupId>
-      <artifactId>opennms-util</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opennms.core</groupId>
       <artifactId>org.opennms.core.lib</artifactId>
       <scope>compile</scope>
